@@ -64,7 +64,7 @@ class KeySlack(object):
     def find_keybase(user):
         kb_str = "#keybase:"
 
-        if hasattr(user.profile, 'title') and user.profile.title != -1:
+        if hasattr(user.profile, 'title') and user.profile.title.find(kb_str) != -1:
             return user.profile.title[user.profile.title.find(kb_str) + len(kb_str):]
         elif hasattr(user.profile, 'phone') and user.profile.phone.find(kb_str) != -1:
             return user.profile.phone[user.profile.phone.find(kb_str) + len(kb_str):]
