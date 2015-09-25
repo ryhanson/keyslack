@@ -7,7 +7,7 @@ This little tool utilizes [Slacker](https://github.com/os/slacker) to interact w
 It uses a Slack private group as a means for transferring PGP messages back and forth. You can send encrypted messages or files to the group and automatically download and decrypt and PGP messages sent to you. Utilizing websockets allows this tool to constantly watch the room for any PGP messages meant for you, then download and decrypt them.
 
 ## Installation
-This tool does require that you have a [Keybase.io](https://keybase.io) account along with the command line too installed.
+This tool does require that you have a [Keybase.io](https://keybase.io) account along with the command line tool installed.
 
 ### Manual install
 ```
