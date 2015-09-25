@@ -33,6 +33,7 @@ Allow you and your team to securely transmit files and messages by utilizing Key
 This is obviously VERY rough. I mainly wrote it out of my own curiosity and because I wanted to get my feet wet with Python. There are no guarantees for any support for this code. It may be abandoned and left here for historical purposes.
 
 With that said, I do plan to work on this some more. Some things I have on my TODO list are:
+
 1. Refactoring, modularizing, and making it more "Pythonic". Any code review and pointers are welcome! I primarily develop in C#/.NET, so this realm is a little different than what I am used to.
 2. Keybase recipient validation: validate that the recipient the user is sending to is in the room, and has the #keybase tag setup in their profile.
 3. Bulk message delivery: send a message per keybase user to the private group. This would allow for an entire team to receive the same update password, certificate, SSH key, etc.
