@@ -28,7 +28,7 @@ class Response(object):
         return json.loads(data, object_hook=self._json_object_hook)
 
 
-class RoyalKey(object):
+class KeySlack(object):
     def __init__(self, token):
         self.client = Slacker(token)
         self.socket = None
@@ -75,7 +75,7 @@ class RoyalKey(object):
 
     def connect_realtime(self):
         if not self.socket:
-            self.socket_login = Response(royal_slack.client.rtm.start().raw).obj
+            self.socket_login = Response(keyslack.client.rtm.start().raw).obj
             if self.socket_login.ok:
                 try:
                     self.socket = create_connection(self.socket_login.url)
@@ -183,9 +183,10 @@ class RoyalKey(object):
         self.input_thread.start()
 
     def get_input(self):
+        self.print_help()
         while True:
             if self.socket_reading:
-                command = raw_input("RoyalKey # ")
+                command = raw_input("KeySlack # ")
                 if not command:
                     continue
                 if command.startswith("encrypt"):
@@ -203,19 +204,19 @@ class RoyalKey(object):
                 elif command == "help":
                     self.print_help()
                 elif command != "exit":
-                    print "I don't understand that command just yet :("
+                    print "Invalid command. Type 'help' for usage or 'exit' to quit."
                     continue
                 else:
-                    sys.exit('[!] Exit command received, quiting now...')
+                    sys.exit('[!] Quiting now...')
 
     def group_watcher(self):
         if self.my_group is None:
             print "[!] Must specify slack group to watch..."
             return
 
-        if royal_slack.connect_realtime():
+        if keyslack.connect_realtime():
             while True:
-                for event in royal_slack.read_events():
+                for event in keyslack.read_events():
                     if event.type == 'hello':
                         self.socket_reading = True
                     elif event.type == 'error':
@@ -265,7 +266,7 @@ if not os.path.exists('token.txt'):
     print "2. Update your Slack profile with #keybase:[keybase_username] at the end of your: title, skype, or phone."
     print "   Example: #keybase:ryhanson"
     print "3. Get a Slack auth token at the bottom of: https://api.slack.com/web"
-    print "4. Enter the name of the private group to watch for PGP Messages."
+    print "4. Enter the name of the private group to watch for PGP Messages.\n"
 
 auth_filename = 'token.txt'
 if os.path.exists(auth_filename):
@@ -291,38 +292,38 @@ else:
 
 print "[-] Authenticating with your auth_token..."
 
-royal_slack = RoyalKey(auth_token)
+keyslack = KeySlack(auth_token)
 try:
-    royal_slack.auth_info()
+    keyslack.auth_info()
 except SlackError, error:
     sys.exit("[!] Authentication failed: %s" % error.message)
 
-print "[+] Authenticated as %s" % royal_slack.my.name
+print "[+] Authenticated as %s" % keyslack.my.name
 print "[-] Looking for your Keybase username..."
 
-if royal_slack.find_keybase(royal_slack.my) is None:
+if keyslack.find_keybase(keyslack.my) is None:
     print "[!] No Keybase username found in your profile."
     print "[-] Add #keybase:[keybase_username] at the end of your: title, skype, or phone."
     sys.exit()
 
-print "[+] Found your keybase username: %s" % royal_slack.my_keybase
+print "[+] Found your keybase username: %s" % keyslack.my_keybase
 print "[-] Checking to see if you're a member of " + group_name + "..."
 
-royalkey = royal_slack.find_group(group_name)
-if royalkey is None:
+keygroup = keyslack.find_group(group_name)
+if keygroup is None:
     sys.exit("[!] You aren't a member of the '" + group_name + "' group...")
 
-print "[+] You are a member of " + royalkey.name + "!"
-print "[-] Finding members of " + royalkey.name + "..."
+print "[+] You are a member of " + keygroup.name + "!"
+print "[-] Finding members of " + keygroup.name + "..."
 
 # This loop could be used to send a message per slack user with keybase enabled
-for member_uid in royalkey.members:
-    member = royal_slack.find_user(member_uid)
+for member_uid in keygroup.members:
+    member = keyslack.find_user(member_uid)
     print "[+] Found: " + member.real_name + " (" + member.name + ")"
-    if royal_slack.find_keybase(member) is not None:
-        print "[+] " + member.real_name + "'s keybase username found: " + royal_slack.find_keybase(member)
+    if keyslack.find_keybase(member) is not None:
+        print "[+] " + member.real_name + "'s keybase username found: " + keyslack.find_keybase(member)
 
-print "[-] Starting thread to watch " + royalkey.name + " for PGP messages..."
+print "[-] Starting thread to watch " + keygroup.name + " for PGP messages...\n"
 
-royal_slack.watch_group(royalkey)
-royal_slack.watch_input()
+keyslack.watch_group(keygroup)
+keyslack.watch_input()
